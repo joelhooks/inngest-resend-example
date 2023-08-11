@@ -14,7 +14,13 @@ If you get stuck, join the [Inngest Discord](https://www.inngest.com/discord) an
 
 ## Setup
 
-This example uses [next-auth](https://next-auth.js.org/) for authentication and [prisma](https://www.prisma.io/) for database access. The project is configured with GitHub for authentication and a SQLite database by default.
+This example uses [next-auth](https://next-auth.js.org/) for authentication and [prisma](https://www.prisma.io/) for database access. The project is configured with GitHub for authentication and a Postgres database by default.
+
+### Database
+
+`next-auth` can be configured with [many different databases and adapters](https://next-auth.js.org/adapters). For this example, we are using Postgres via Prisma. You can find the configuration in `prisma/schema.prisma`.
+
+A quick way to get postgres up and running is using [Neon](https://neon.tech/), which has a free tier and provides you with a URL that you can use to connect to your database by adding it to the `DATABASE_URL` env var.
 
 ### GitHub OAuth
 
