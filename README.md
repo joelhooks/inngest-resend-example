@@ -22,11 +22,13 @@ This example uses [next-auth](https://next-auth.js.org/) for authentication and 
 
 A quick way to get postgres up and running is using [Neon](https://neon.tech/), which has a free tier and provides you with a URL that you can use to connect to your database by adding it to the `DATABASE_URL` env var.
 
+Technically the database is optional, but it's more useful to explore the example with a database in place. ALternatives to Neon include services like Heroku or similar that allow you to create a Postgres database.
+
 ### GitHub OAuth
 
 You'll need to setup a GitHub OAuth app to use this example. You can do that [here](https://github.com/settings/developers) for a personal account using `http://localhost:3000/api/auth/callback/github` as the callback URL by default. If you are configuring a different `localhost` port, you'll need to update the callback URL accordingly. Check [here for the GitHub provider configuration options](https://next-auth.js.org/providers/github).
 
-`next-auth` supports **many** providers, so if you'd like to explore more options to suit your needs.
+[]`next-auth` supports **many** providers](https://next-auth.js.org/providers/), so if you'd like to explore more options to suit your needs.
 
 ## What's next? How do I make an app with this?
 
