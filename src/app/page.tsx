@@ -10,7 +10,7 @@ export default async function Home() {
   async function handleButtonOne() {
     "use server";
     await inngest.send({
-      name: "user/email.reaction",
+      name: "user/created.document",
       user: session?.user,
       data: {
         message: "Hello World",

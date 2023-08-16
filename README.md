@@ -60,12 +60,61 @@ The standard configuration for Inngest is to serve an API route at `/api/inngest
 
 ```typescript
 export const { GET, POST, PUT } = serve(inngest, [
-  userEmailReaction,
   userCreated,
 ]);
 ```
 
-The `{ GET, POST, PUT }` are the HTTP methods that Inngest will respond to. The `serve` function takes an array of functions that you want to expose to Inngest. In this case, we are exposing two jobs: `userEmailReaction` and `userCreated`.
+The `{ GET, POST, PUT }` are the HTTP methods that Inngest will respond to. The `serve` function takes an array of functions that you want to expose to Inngest. In this case, we are exposing just one function: `userCreated`.
+
+```typescript
+export const userCreated = inngest.createFunction(
+  { name: "A User Was Created" },
+  { event: "user/created" },
+  async ({ event, step }) => {
+    const { email } = event.user;
+
+    await step.run("send-welcome-email", async () => {
+      return sendEmail({
+        to: email,
+        subject: "Welcome to our app!",
+        body: "<p>Thanks for signing up!</p>",
+      });
+    });
+
+    const completedAction = await step.waitForEvent("user/created.document", {
+      timeout: "1m",
+      if: "event.user.email == async.user.email",
+    });
+
+    if (!completedAction) {
+      await step.run("send-nudge-email", async () => {
+        return sendEmail({
+          to: email,
+          subject: "How can we help!",
+          body: "<p>What can we do better? We are always here to help you suceed.</p>",
+        });
+      });
+    } else {
+      await step.run("send-congrats-email", async () => {
+        return sendEmail({
+          to: email,
+          subject: "You did it!",
+          body: "<p>We are so glad figured it out! It's challenging to do anything in this rough and tumble world so congrats on that.</p>",
+        });
+      });
+    }
+  }
+);
+```
+
+The `userCreated` function is a multi-step function that performs several actions.
+
+* Sends the user a welcome email
+* Waits 1 minute for the user to perform a specific action
+* If the user performs the action, sends a congratulations email
+* If the user does not perform the action, sends a nudge email
+
+
 
 Those functions are both located in `/src/inngest/functions`. Feel free to add your own functions but **remember to add any functions you create to the array that is passed to `serve`** so that Inngest can find them!
 
@@ -85,9 +134,7 @@ async function handleButtonOne() {
   await inngest.send({
     name: "user/email.reaction",
     user: session?.user,
-    data: {
-      message: "Hello World",
-    },
+    data: {},
   });
 }
 ```
