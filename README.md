@@ -36,7 +36,7 @@ Technically the database is optional, but it's more useful to explore the exampl
 
 You'll need to setup a GitHub OAuth app to use this example. You can do that [here](https://github.com/settings/developers) for a personal account using `http://localhost:3000/api/auth/callback/github` as the callback URL by default. If you are configuring a different `localhost` port, you'll need to update the callback URL accordingly. Check [here for the GitHub provider configuration options](https://next-auth.js.org/providers/github).
 
-[]`next-auth` supports **many** providers](https://next-auth.js.org/providers/), so if you'd like to explore more options to suit your needs.
+[`next-auth` supports **many** providers](https://next-auth.js.org/providers/), so if you'd like to explore more options to suit your needs.
 
 ### Inngest
 
@@ -127,11 +127,21 @@ Before you deploy you'll need to add the following environment variables to your
 - `GITHUB_CLIENT_ID`
 - `GITHUB_CLIENT_SECRET`
 - `DATABASE_URL`
+- `INNGEST_EVENT_KEY`
+- `INNGEST_SIGNING_KEY`
+- `RESEND_API_KEY`
+- `FROM_EMAIL`
 - `NEXTAUTH_SECRET`
 
 You can get the `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from your GitHub OAuth app. The `DATABASE_URL` is the URL to your Postgres database. The `NEXTAUTH_SECRET` is a random string that you can generate with `openssl rand -hex 32`.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjoelhooks%2Finngest-resend-example%2Ftree%2Fmain&env=GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,DATABASE_URL,NEXTAUTH_SECRET&project-name=inngest-resend-example&repository-name=inngest-resend-example)
+The `INNGEST_EVENT_KEY` and the `INNGEST_SIGNING_KEY` can be found in the Inngest cloud dashboard for your application or applied to your application via the Inngest Vercel integration.
+
+The `RESEND_API_KEY` is the API key that you can find in the Resend dashboard for your application.
+
+The `FROM_EMAIL` is the email addresses that you want to send emails from and reply to. Note that this has to be verified with Resend if you use that service.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjoelhooks%2Finngest-resend-example%2Ftree%2Fmain&env=INNGEST_EVENT_KEY,INNGEST_SIGNING_KEY,RESEND_API_KEY,GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,DATABASE_URL,NEXTAUTH_SECRET,FROM_EMAIL&project-name=inngest-resend-example&repository-name=inngest-resend-example)
 
 ## What's next? How do I make an app with this?
 
