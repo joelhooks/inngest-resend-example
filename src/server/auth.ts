@@ -9,6 +9,7 @@ import GithubProvider from "next-auth/providers/github";
 import { env } from "@/env.mjs";
 import { prisma } from "@/server/db";
 import { type User } from "@prisma/client";
+import { inngest } from "@/inngest/inngest.client";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -41,6 +42,19 @@ export const authOptions: NextAuthOptions = {
         id: user.id,
       },
     }),
+  },
+  events: {
+    /**
+     * 👋 Internally next-auth creates event hooks to handle any application
+     * side effects that need to happen when an event occurs
+     * in our case we want to send an event to inngest when a user is created
+     * so that we can track user signups and other user related events.
+     * @see https://next-auth.js.org/configuration/events#createuser
+     * @param param0
+     */
+    createUser: async ({ user }) => {
+      inngest.send({ name: "user/created", user, data: {} });
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [

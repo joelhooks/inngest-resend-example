@@ -6,11 +6,19 @@ Resend is a modern email service provider that play nicely with React components
 
 Inngest is a platform for easily scheduling queues, background jobs, and workflows.
 
-For this example, we will be sending a welcome email when a user signs up for the first time and a follow up email if they don't perform a specific action within a certain time period.
-
-For the sake of demonstration, we will keep it simple! But it should give you a good idea of the potential of setting up a system like this and the things you might do within your own applications.
-
 If you get stuck, join the [Inngest Discord](https://www.inngest.com/discord) and we'll help you out!
+
+## How it works
+
+Before we get into the technical details, it's important to understand the whats occurring in this example.
+
+This is a relatively simple (😅) Next.js app that includes a connection to a database via Prisma, authentication using NextAuth, and a simple page to demonstrate functionality.
+
+When a new user joins the site for the first time, we will send them a welcome email. If they don't perform a specific action within a certain time period, we will send them a follow up email.
+
+### Beyond the basics
+
+This is meant to be a starting point for you to build your own application. You can use this as a starting point to build your own application, or you can use it as a reference to add functionality to your existing application.
 
 ## Setup
 
@@ -29,6 +37,101 @@ Technically the database is optional, but it's more useful to explore the exampl
 You'll need to setup a GitHub OAuth app to use this example. You can do that [here](https://github.com/settings/developers) for a personal account using `http://localhost:3000/api/auth/callback/github` as the callback URL by default. If you are configuring a different `localhost` port, you'll need to update the callback URL accordingly. Check [here for the GitHub provider configuration options](https://next-auth.js.org/providers/github).
 
 []`next-auth` supports **many** providers](https://next-auth.js.org/providers/), so if you'd like to explore more options to suit your needs.
+
+### Inngest
+
+Inngest is a platform for easily scheduling queues, background jobs, and workflows in your applications. 
+
+Inngest makes distributed systems easy to build and maintain and takes the pain out of scheduling jobs and workflows by managing all of the associated infrastructure for you.
+
+You can create a free account [here](https://inngest.com/).
+
+In this example we are using Inngest to schedule a job to send a follow up email to users who have not performed a specific action within a certain time period.
+
+To get started, you will run the local Inngest Dev Server:
+
+```shell
+npx inngest-cli@latest dev
+```
+
+This starts the dev server, which will automatically find the Next.js application and allow you to test your jobs locally.
+
+The standard configuration for Inngest is to serve an API route at `/api/inngest` and in this application you can find that by navigating to `/src/app/api/inngest/route.ts` where the route is defined and exported.
+
+```typescript
+export const { GET, POST, PUT } = serve(inngest, [
+  userEmailReaction,
+  userCreated,
+]);
+```
+
+The `{ GET, POST, PUT }` are the HTTP methods that Inngest will respond to. The `serve` function takes an array of functions that you want to expose to Inngest. In this case, we are exposing two jobs: `userEmailReaction` and `userCreated`.
+
+Those functions are both located in `/src/inngest/functions`. Feel free to add your own functions but **remember to add any functions you create to the array that is passed to `serve`** so that Inngest can find them!
+
+👋 Inngest functions have to be added to the array passed to `serve` in order for Inngest to find them.
+
+The other important thing to be able to locate is the Inngest client which is located in `/src/inngest/inngest.client.ts`. This is imported where you want to send events to Inngest.
+
+👋 Inngest is 100% server-side and is not imported for use in the browser!
+
+In this example we import the client in two places.
+
+The first is our simple form located `/src/app/page.tsx` where it is used in a Next.js server action to send an event when a button is pushed. This is the action that we are waiting for the user to perform in order to send the follow up email.
+
+```typescript
+async function handleButtonOne() {
+  "use server";
+  await inngest.send({
+    name: "user/email.reaction",
+    user: session?.user,
+    data: {
+      message: "Hello World",
+    },
+  });
+}
+```
+
+The other event is dispatched from the NextAuth config in the `createdUser` callback that library provide located in `/src/server/auth.ts`:
+
+```typescript
+events: {
+  /**
+   * 👋 Internally next-auth creates event hooks to handle any application
+   * side effects that need to happen when an event occurs
+   * in our case we want to send an event to inngest when a user is created
+   * so that we can track user signups and other user related events.
+   * @see https://next-auth.js.org/configuration/events#createuser
+   * @param param0
+   */
+  createUser: async ({ user }) => {
+    inngest.send({ name: "user/created", user, data: {} });
+  },
+},
+```
+
+This creates a complete workflow that reacts to the creation of a new user by sending them a welcome email and waits for a period of time to send a follow up if they don't perform a specific action OR sends them a congrats email if they do perform the action.
+
+Simple, but powerful!
+
+### Sending Emails with Resend
+
+Resend makes it relatively easy to get started sending emails. You can create a free account [here](https://resend.com/).
+
+To send emails, you'll also need to [verify a sending domain with Resend using DNS](https://resend.com/domains). This is a simple process that will allow you to send emails from your domain. It's required because Resend is built to send transactional emails.
+
+## Deploy the Application
+
+Before you deploy you'll need to add the following environment variables to your deployment:
+
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
+- `DATABASE_URL`
+- `NEXTAUTH_SECRET`
+
+You can get the `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from your GitHub OAuth app. The `DATABASE_URL` is the URL to your Postgres database. The `NEXTAUTH_SECRET` is a random string that you can generate with `openssl rand -hex 32`.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjoelhooks%2Finngest-resend-example%2Ftree%2Fmain&env=GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,DATABASE_URL,NEXTAUTH_SECRET&project-name=inngest-resend-example&repository-name=inngest-resend-example)
 
 ## What's next? How do I make an app with this?
 
