@@ -137,6 +137,8 @@ You can get the `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from your GitHub O
 
 The `INNGEST_EVENT_KEY` and the `INNGEST_SIGNING_KEY` can be found in the Inngest cloud dashboard for your application or applied to your application via the Inngest Vercel integration.
 
+👋 [Details on deploying your Inngest application to production can be found here](https://www.inngest.com/docs/deploy)
+
 The `RESEND_API_KEY` is the API key that you can find in the Resend dashboard for your application.
 
 The `FROM_EMAIL` is the email addresses that you want to send emails from and reply to. Note that this has to be verified with Resend if you use that service.
