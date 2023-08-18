@@ -48,6 +48,15 @@ export const userCreated = inngest.createFunction(
       });
     });
 
+    /**
+     * 👋 `step.waitForEvent` is a special function that will wait for a specific event to occur.
+     * In this case, we are waiting for the `user/created.document` event to occur.
+     * The timeout here is set for 1 minute.
+     * If the event does not occur within the timeout, the function will continue to the next step.
+     * We are also using the `if` option to only wait for the event if the email matches.
+     *
+     * @see https://www.inngest.com/docs/reference/functions/step-wait-for-event
+     */
     const completedAction = await step.waitForEvent("user/created.document", {
       timeout: "1m",
       if: "event.user.email == async.user.email",
